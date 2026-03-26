@@ -1,6 +1,7 @@
 package it.unibo.pps.tasks.adts
 
-import it.unibo.pps.u03.extensionmethods.Sequences.Sequence, Sequence.*
+import it.unibo.pps.u03.extensionmethods.Sequences.Sequence
+import it.unibo.pps.u03.extensionmethods.Sequences.Sequence.*
 
 /*  Exercise 2: 
  *  Implement the below trait, and write a meaningful test.
@@ -20,18 +21,21 @@ object SchoolModel:
      * e.g.,
      * teacher("John") // => Teacher("John")
      * Note!! The internal representation of a teacher may vary, decide what is the best for you
+     *
      * @param name the name of the teacher
      * @return the teacher created
      */
     def teacher(name: String): Teacher
+
     /**
      * This a factory method for create a course from a name
      * e.g.,
      * course("Math") // => Course("Math")
      * Note!! The internal representation of a course may vary, decide what is the best for you
+     *
      * @param name the name of the course
      * @return the course created
-     *  */
+     * */
     def course(name: String): Course
 
     /**
@@ -40,10 +44,11 @@ object SchoolModel:
      * emptySchool // => School(courses = Nil(), teachers = Nil(), teacherToCourses = Nil())
      * NOTE!! The above is just an example, the internal representation may vary, decide what is the best for you
      * You can store just the teacherToCourses, or having a case class for the school, or whatever you think is the best
+     *
      * @return the empty school
      */
     def emptySchool: School
-    
+
     extension (school: School)
       /**
        * This method should return the list of courses
@@ -51,9 +56,10 @@ object SchoolModel:
        * emptySchool.courses // => Nil()
        * emptySchool.setTeacherToCourse(teacher("John"), course("Math")).courses // => Cons("Math", Nil())
        * emptySchool
-       *  .setTeacherToCourse(teacher("John"), course("Math"))
-       *  .setTeacherToCourse(teacher("John"), course("Italian")).courses // => Cons("Math", Cons("Italian", Nil()))
+       * .setTeacherToCourse(teacher("John"), course("Math"))
+       * .setTeacherToCourse(teacher("John"), course("Italian")).courses // => Cons("Math", Cons("Italian", Nil()))
        * Note!! If there are duplicates, just return them once
+       *
        * @return the list of courses
        */
       def courses: Sequence[String]
@@ -64,9 +70,10 @@ object SchoolModel:
        * emptySchool.setTeacherToCourse(teacher("John"), course("Math")).teachers // => Cons("John", Nil())
        * val john = teacher("John")
        * emptySchool
-       *  .setTeacherToCourse(john, course("Math"))
-       *  .setTeacherToCourse(john, course("Italian")).teachers // => Cons("John", Nil())
+       * .setTeacherToCourse(john, course("Math"))
+       * .setTeacherToCourse(john, course("Italian")).teachers // => Cons("John", Nil())
        * Note!! If there are duplicates, just return them once
+       *
        * @return the list of teachers
        */
       def teachers: Sequence[String]
@@ -74,20 +81,21 @@ object SchoolModel:
        * This method should return a new school with the teacher assigned to the course
        * e.g.,
        * emptySchool
-       *   .setTeacherToCourse(teacher("John"), course("Math")) // => School(courses = Cons("Math", Nil()), teachers = Cons("John", Nil()), teacherToCourses = Cons(("John", "Math"), Nil()))
-       *  */
+       * .setTeacherToCourse(teacher("John"), course("Math")) // => School(courses = Cons("Math", Nil()), teachers = Cons("John", Nil()), teacherToCourses = Cons(("John", "Math"), Nil()))
+       * */
       def setTeacherToCourse(teacher: Teacher, course: Course): School
       /**
        * This method should return the list of courses assigned to a teacher
        * e.g.,
        * emptySchool.coursesOfATeacher(teacher("John")) // => Nil()
        * emptySchool
-       *   .setTeacherToCourse(teacher("John"), course("Math"))
-       *   .coursesOfATeacher(teacher("John")) // => Cons("Math", Nil())
+       * .setTeacherToCourse(teacher("John"), course("Math"))
+       * .coursesOfATeacher(teacher("John")) // => Cons("Math", Nil())
        * emptySchool
-       *   .setTeacherToCourse(teacher("John"), course("Math"))
-       *   .setTeacherToCourse(teacher("John"), course("Italian"))
-       *   .coursesOfATeacher(teacher("John")) // => Cons("Math", Cons("Italian", Nil()))
+       * .setTeacherToCourse(teacher("John"), course("Math"))
+       * .setTeacherToCourse(teacher("John"), course("Italian"))
+       * .coursesOfATeacher(teacher("John")) // => Cons("Math", Cons("Italian", Nil()))
+       *
        * @return the list of courses assigned to a teacher
        */
       def coursesOfATeacher(teacher: Teacher): Sequence[Course]
@@ -96,8 +104,8 @@ object SchoolModel:
        * e.g.,
        * emptySchool.hasTeacher("John") // => false
        * emptySchool
-       *  .setTeacherToCourse(teacher("John"), course("Math"))
-       *  .hasTeacher("John") // => true
+       * .setTeacherToCourse(teacher("John"), course("Math"))
+       * .hasTeacher("John") // => true
        *
        */
       def hasTeacher(name: String): Boolean
@@ -106,27 +114,48 @@ object SchoolModel:
        * e.g.,
        * emptySchool.hasCourse("Math") // => false
        * emptySchool
-       *  .setTeacherToCourse(teacher("John"), course("Math"))
-       *  .hasCourse("Math") // => true
+       * .setTeacherToCourse(teacher("John"), course("Math"))
+       * .hasCourse("Math") // => true
        *
        */
       def hasCourse(name: String): Boolean
-  object BasicSchoolModule extends SchoolModule:
-    override type School = Nothing
-    override type Teacher = Nothing
-    override type Course = Nothing
 
-    def teacher(name: String): Teacher = ???
-    def course(name: String): Course = ???
-    def emptySchool: School = ???
+  object BasicSchoolModule extends SchoolModule:
+    private case class SchoolImpl(teachers: Sequence[Teacher], courses: Sequence[Course], teacherToCourses: Sequence[(Teacher, Course)])
+
+    override opaque type School = SchoolImpl
+    override opaque type Teacher = String
+    override opaque type Course = String
+
+    def teacher(name: String): Teacher = name
+
+    def course(name: String): Course = name
+
+    def emptySchool: School = SchoolImpl(Nil(), Nil(), Nil())
 
     extension (school: School)
-      def courses: Sequence[String] = ???
-      def teachers: Sequence[String] = ???
-      def setTeacherToCourse(teacher: Teacher, course: Course): School = ???
-      def coursesOfATeacher(teacher: Teacher): Sequence[Course] = ???
-      def hasTeacher(name: String): Boolean = ???
-      def hasCourse(name: String): Boolean = ???
+      def courses: Sequence[String] = school match
+        case SchoolImpl(_, courses, _) => courses.distinct
+
+      def teachers: Sequence[String] = school match
+        case SchoolImpl(teachers, _, _) => teachers.distinct
+
+      def setTeacherToCourse(teacher: Teacher, course: Course): School = school match
+        case SchoolImpl(teachers, courses, teacherToCourses) => SchoolImpl(
+          teachers.concat(Cons(teacher, Nil())),
+          courses.concat(Cons(course, Nil())),
+          teacherToCourses.concat(Cons((teacher, course), Nil()))
+        )
+
+      def coursesOfATeacher(teacher: Teacher): Sequence[Course] = school match
+        case SchoolImpl(_, _, teacherToCourses) => teacherToCourses.filter((t, _) => t == teacher).map((_, c) => c).distinct
+
+      def hasTeacher(name: String): Boolean = school match
+        case SchoolImpl(teachers, _, _) => teachers.contains(teacher(name))
+
+      def hasCourse(name: String): Boolean = school match
+        case SchoolImpl(te_, courses, _) => courses.contains(course(name))
+
 @main def examples(): Unit =
   import SchoolModel.BasicSchoolModule.*
   val school = emptySchool
